@@ -1,0 +1,5 @@
+# Build & Test artifacts
+tests/temp_sandbox/
+*.suo
+*.user
+*.pdb
