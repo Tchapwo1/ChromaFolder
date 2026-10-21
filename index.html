@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ChromaFolder — Windows 11 Folder Colorizer (Zero Bloat, 0 MB Background RAM)</title>
+  <meta name="description" content="Color-code any Windows folder directly from the File Explorer context menu. Zero bloat, zero telemetry, 0 MB background RAM.">
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --card-bg: #111827;
+      --card-border: #1f293d;
+      --text-main: #f9fafb;
+      --text-muted: #9ca3af;
+      --accent: #3b82f6;
+      --accent-hover: #2563eb;
+      --red: #ef4444;
+      --blue: #3b82f6;
+      --green: #22c55e;
+      --yellow: #eab308;
+      --orange: #f97316;
+      --purple: #a855f7;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text-main);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* Header */
+    header {
+      padding: 24px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      text-decoration: none;
+      color: var(--text-main);
+    }
+
+    .brand-badge {
+      font-size: 0.75rem;
+      background: rgba(59, 130, 246, 0.15);
+      color: #60a5fa;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      padding: 2px 8px;
+      border-radius: 9999px;
+      font-weight: 600;
+    }
+
+    .nav-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      margin-left: 20px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover {
+      color: var(--text-main);
+    }
+
+    /* Hero */
+    .hero {
+      padding: 72px 0 48px;
+      text-align: center;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #1e293b;
+      border: 1px solid #334155;
+      padding: 6px 16px;
+      border-radius: 9999px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: #94a3b8;
+      margin-bottom: 24px;
+    }
+
+    .pill-dot {
+      width: 8px;
+      height: 8px;
+      background-color: #22c55e;
+      border-radius: 50%;
+      box-shadow: 0 0 8px #22c55e;
+    }
+
+    h1 {
+      font-size: 3.25rem;
+      line-height: 1.15;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 20px;
+      background: linear-gradient(180deg, #ffffff 0%, #cbd5e1 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-subtitle {
+      font-size: 1.25rem;
+      color: var(--text-muted);
+      max-width: 680px;
+      margin: 0 auto 36px;
+    }
+
+    .cta-group {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: #2563eb;
+      color: #ffffff;
+      padding: 14px 28px;
+      border-radius: 10px;
+      font-size: 1.05rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.1s;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);
+    }
+
+    .btn-primary:hover {
+      background: #1d4ed8;
+      transform: translateY(-1px);
+    }
+
+    .cli-box {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      background: #1e293b;
+      border: 1px solid #334155;
+      padding: 12px 20px;
+      border-radius: 10px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.95rem;
+      color: #e2e8f0;
+    }
+
+    .copy-btn {
+      background: #334155;
+      border: none;
+      color: #94a3b8;
+      padding: 4px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .copy-btn:hover {
+      background: #475569;
+      color: #fff;
+    }
+
+    .meta-proof {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      font-size: 0.85rem;
+      color: #64748b;
+      margin-top: 12px;
+    }
+
+    /* Video Player Showcase */
+    .video-card {
+      margin: 48px auto;
+      max-width: 900px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+    }
+
+    .video-card video {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    /* Interactive Palette Previewer */
+    .interactive-section {
+      padding: 60px 0;
+      text-align: center;
+    }
+
+    .interactive-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 40px;
+      max-width: 700px;
+      margin: 32px auto 0;
+    }
+
+    .folder-demo-preview {
+      width: 120px;
+      height: 100px;
+      margin: 0 auto 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s ease;
+    }
+
+    .folder-demo-preview svg {
+      width: 96px;
+      height: 96px;
+      filter: drop-shadow(0 8px 16px rgba(0,0,0,0.4));
+      transition: fill 0.3s ease;
+    }
+
+    .color-swatches {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    .swatch-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: transform 0.15s, border-color 0.15s;
+    }
+
+    .swatch-btn:hover {
+      transform: scale(1.1);
+    }
+
+    .swatch-btn.active {
+      border-color: #ffffff;
+      transform: scale(1.15);
+      box-shadow: 0 0 12px rgba(255, 255, 255, 0.5);
+    }
+
+    .swatch-red { background: var(--red); }
+    .swatch-blue { background: var(--blue); }
+    .swatch-green { background: var(--green); }
+    .swatch-yellow { background: var(--yellow); }
+    .swatch-orange { background: var(--orange); }
+    .swatch-purple { background: var(--purple); }
+
+    .reset-demo-btn {
+      background: transparent;
+      border: 1px solid #374151;
+      color: #9ca3af;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .reset-demo-btn:hover {
+      background: #1f2937;
+      color: #fff;
+    }
+
+    /* Pillars Grid */
+    .pillars {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+      padding: 60px 0;
+    }
+
+    .pillar-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 28px;
+      transition: border-color 0.2s;
+    }
+
+    .pillar-card:hover {
+      border-color: #3b82f6;
+    }
+
+    .pillar-icon {
+      font-size: 1.75rem;
+      margin-bottom: 16px;
+      display: inline-block;
+    }
+
+    .pillar-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .pillar-desc {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    /* Comparison Table */
+    .table-section {
+      padding: 60px 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 24px;
+      background: var(--card-bg);
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--card-border);
+    }
+
+    th, td {
+      padding: 16px 20px;
+      text-align: left;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    th {
+      background: #172033;
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: #94a3b8;
+    }
+
+    td {
+      font-size: 0.95rem;
+    }
+
+    .badge-yes {
+      color: #22c55e;
+      font-weight: 600;
+    }
+
+    .badge-no {
+      color: #ef4444;
+      font-weight: 500;
+    }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid var(--card-border);
+      padding: 40px 0;
+      text-align: center;
+      color: #64748b;
+      font-size: 0.9rem;
+    }
+
+    footer a {
+      color: #94a3b8;
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <a href="#" class="brand">
+        <span>🎨 ChromaFolder</span>
+        <span class="brand-badge">Windows 11</span>
+      </a>
+      <nav class="nav-links">
+        <a href="#demo">Interactive Demo</a>
+        <a href="#features">Features</a>
+        <a href="#comparison">Compare</a>
+        <a href="https://github.com/Tchapwo1/ChromaFolder" target="_blank">GitHub</a>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <div class="pill">
+        <span class="pill-dot"></span>
+        v1.0.0 Free Beta is Live &bull; Windows 11 x64
+      </div>
+      <h1>Color your folders in seconds.<br>Zero bloat. 0 MB background RAM.</h1>
+      <p class="hero-subtitle">
+        Right-click any folder in Windows 11 File Explorer and assign distinct colors instantly. 
+        No background daemons, no telemetry, and zero administrator elevation.
+      </p>
+
+      <div class="cta-group">
+        <a href="ChromaFolderSetup.exe" class="btn-primary" download>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+          Download Free Beta (2.1 MB)
+        </a>
+        <div class="cli-box">
+          <code>winget install ChromaFolder</code>
+          <button class="copy-btn" onclick="navigator.clipboard.writeText('winget install ChromaFolder'); this.innerText='Copied!'; setTimeout(() => this.innerText='Copy', 2000);">Copy</button>
+        </div>
+      </div>
+
+      <div class="meta-proof">
+        <span>✓ No Admin / UAC Required</span>
+        <span>✓ 100% Offline & Private</span>
+        <span>✓ Instant Explorer Refresh</span>
+      </div>
+
+      <!-- Teaser Video -->
+      <div class="video-card">
+        <video controls poster="poster.png" preload="metadata">
+          <source src="teaser.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
+      </div>
+    </section>
+
+    <!-- Interactive Palette Demo -->
+    <section id="demo" class="interactive-section">
+      <h2 style="font-size: 2rem; margin-bottom: 8px;">Try the Live Palette</h2>
+      <p style="color: var(--text-muted);">Click a color below to see how folders transform in Windows 11:</p>
+
+      <div class="interactive-card">
+        <div class="folder-demo-preview" id="folderPreview">
+          <svg id="folderSvg" viewBox="0 0 24 24" fill="#3b82f6" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/>
+          </svg>
+        </div>
+
+        <div class="color-swatches">
+          <button class="swatch-btn swatch-red" title="Red (Urgent / Deadlines)" onclick="setColor('#ef4444', this)"></button>
+          <button class="swatch-btn swatch-blue active" title="Blue (Core Projects)" onclick="setColor('#3b82f6', this)"></button>
+          <button class="swatch-btn swatch-green" title="Green (Finance / Invoices)" onclick="setColor('#22c55e', this)"></button>
+          <button class="swatch-btn swatch-yellow" title="Yellow (Pending Review)" onclick="setColor('#eab308', this)"></button>
+          <button class="swatch-btn swatch-orange" title="Orange (Security & Domains)" onclick="setColor('#f97316', this)"></button>
+          <button class="swatch-btn swatch-purple" title="Purple (Personal & Creative)" onclick="setColor('#a855f7', this)"></button>
+        </div>
+
+        <button class="reset-demo-btn" onclick="setColor('#eab308', null); document.querySelectorAll('.swatch-btn').forEach(b => b.classList.remove('active'));">
+          ↺ Reset to Default Windows Yellow
+        </button>
+      </div>
+    </section>
+
+    <!-- Pillars -->
+    <section id="features" class="pillars">
+      <div class="pillar-card">
+        <div class="pillar-icon">⚡</div>
+        <div class="pillar-title">0 MB Background RAM</div>
+        <div class="pillar-desc">
+          Executes strictly on-demand via the native Windows Shell. Never runs background services, tray pollers, or telemetry agents.
+        </div>
+      </div>
+
+      <div class="pillar-card">
+        <div class="pillar-icon">🛡️</div>
+        <div class="pillar-title">Zero-UAC User Install</div>
+        <div class="pillar-desc">
+          Installs 100% into your user profile (<code>%LocalAppData%</code>). Never asks for Administrator passwords or elevated privileges.
+        </div>
+      </div>
+
+      <div class="pillar-card">
+        <div class="pillar-icon">🔒</div>
+        <div class="pillar-title">100% Offline & Private</div>
+        <div class="pillar-desc">
+          Zero internet calls, zero tracking pixels, zero analytics. Your folder hierarchies and data stay strictly on your local machine.
+        </div>
+      </div>
+
+      <div class="pillar-card">
+        <div class="pillar-icon">🔄</div>
+        <div class="pillar-title">Safe 1-Click Reset</div>
+        <div class="pillar-desc">
+          Changes your mind anytime. Right-click &rarr; Reset to Default cleanly restores the native Windows folder appearance and strips metadata.
+        </div>
+      </div>
+
+      <div class="pillar-card">
+        <div class="pillar-icon">🚀</div>
+        <div class="pillar-title">Instant Redraw</div>
+        <div class="pillar-desc">
+          Uses native Win32 <code>SHChangeNotify</code> APIs to refresh File Explorer immediately without requiring you to restart <code>explorer.exe</code>.
+        </div>
+      </div>
+
+      <div class="pillar-card">
+        <div class="pillar-icon">📦</div>
+        <div class="pillar-title">Clean Uninstaller</div>
+        <div class="pillar-desc">
+          Uninstalling via Windows Settings cleanly removes all registry verbs and icon assets, leaving zero broken references behind.
+        </div>
+      </div>
+    </section>
+
+    <!-- Comparison -->
+    <section id="comparison" class="table-section">
+      <h2 style="font-size: 2rem; text-align: center; margin-bottom: 8px;">How ChromaFolder Compares</h2>
+      <p style="text-align: center; color: var(--text-muted);">Built for developers and productivity enthusiasts who hate bloat:</p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Feature</th>
+            <th>ChromaFolder</th>
+            <th>Legacy Tools (e.g. Softorino)</th>
+            <th>Manual Properties Hacks</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Background Process</strong></td>
+            <td class="badge-yes">0 MB (Zero daemons)</td>
+            <td class="badge-no">Resident tray processes</td>
+            <td class="badge-yes">None</td>
+          </tr>
+          <tr>
+            <td><strong>Admin / UAC Required</strong></td>
+            <td class="badge-yes">Never (Per-user)</td>
+            <td class="badge-no">Yes (Elevated installer)</td>
+            <td class="badge-yes">No</td>
+          </tr>
+          <tr>
+            <td><strong>Speed to Color</strong></td>
+            <td class="badge-yes">2 clicks (&lt;1 sec)</td>
+            <td class="badge-no">Heavy GUI modal</td>
+            <td class="badge-no">8+ manual clicks</td>
+          </tr>
+          <tr>
+            <td><strong>Telemetry & Trackers</strong></td>
+            <td class="badge-yes">Zero (100% Offline)</td>
+            <td class="badge-no">Telemetry / Upsells</td>
+            <td class="badge-yes">None</td>
+          </tr>
+          <tr>
+            <td><strong>1-Click Reset</strong></td>
+            <td class="badge-yes">Built-in Right-Click Verb</td>
+            <td class="badge-no">Requires opening app</td>
+            <td class="badge-no">Manual file deletion</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <footer>
+      <p>ChromaFolder is built with pride by Paris (<a href="https://github.com/Tchapwo1" target="_blank">@Tchapwo1</a>) &bull; Open-Spec Windows 11 Utility</p>
+      <p style="margin-top: 8px; font-size: 0.8rem;">Independent software. Windows 11 and File Explorer are registered trademarks of Microsoft Corporation.</p>
+    </footer>
+  </div>
+
+  <script>
+    function setColor(hex, element) {
+      document.getElementById('folderSvg').setAttribute('fill', hex);
+      if (element) {
+        document.querySelectorAll('.swatch-btn').forEach(b => b.classList.remove('active'));
+        element.classList.add('active');
+      }
+    }
+  </script>
+</body>
+</html>
