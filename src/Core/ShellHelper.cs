@@ -39,15 +39,18 @@ namespace FolderColorizer.Core
             IntPtr pPath = Marshal.StringToHGlobalUni(folderPath);
             try
             {
-                // Notify Explorer to update this specific folder item
+                // Notify Explorer to update this specific folder item immediately
                 SHChangeNotify(SHCNE_UPDATEITEM | SHCNF_FLUSH, SHCNF_PATHW, pPath, IntPtr.Zero);
             }
             finally
             {
                 Marshal.FreeHGlobal(pPath);
             }
+        }
 
-            // Also signal association / icon refresh
+        public static void NotifyShellAssociationsChanged()
+        {
+            // Flushes shell association / context menu cache on install/uninstall
             SHChangeNotify(SHCNE_ASSOCCHANGED | SHCNF_FLUSH, SHCNF_IDLIST, IntPtr.Zero, IntPtr.Zero);
         }
 

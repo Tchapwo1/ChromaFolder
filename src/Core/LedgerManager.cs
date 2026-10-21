@@ -21,12 +21,23 @@ namespace FolderColorizer.Core
         private static string GetLedgerPath()
         {
             string appData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-            string dir = Path.Combine(appData, @"FolderColorizer\data");
+            string dir = Path.Combine(appData, @"ChromaFolder\data");
+            string legacyDir = Path.Combine(appData, @"FolderColorizer\data");
+            string ledgerPath = Path.Combine(dir, "assignments.json");
+            string legacyLedger = Path.Combine(legacyDir, "assignments.json");
+
             if (!Directory.Exists(dir))
             {
                 Directory.CreateDirectory(dir);
             }
-            return Path.Combine(dir, "assignments.json");
+
+            // Automatically migrate existing ledger if new one doesn't exist yet
+            if (!File.Exists(ledgerPath) && File.Exists(legacyLedger))
+            {
+                try { File.Copy(legacyLedger, ledgerPath, true); } catch { }
+            }
+
+            return ledgerPath;
         }
 
         public static List<FolderAssignment> LoadAssignments()

@@ -30,10 +30,18 @@ namespace FolderColorizer
             {
                 // Fallback to LocalAppData if running from installation
                 string appData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-                string candidate = Path.Combine(appData, @"FolderColorizer\icons");
+                string candidate = Path.Combine(appData, @"ChromaFolder\icons");
                 if (Directory.Exists(candidate))
                 {
                     assetsDir = candidate;
+                }
+                else
+                {
+                    string legacyCandidate = Path.Combine(appData, @"FolderColorizer\icons");
+                    if (Directory.Exists(legacyCandidate))
+                    {
+                        assetsDir = legacyCandidate;
+                    }
                 }
             }
 
@@ -55,7 +63,7 @@ namespace FolderColorizer
             {
                 if (args.Length < 3)
                 {
-                    Console.Error.WriteLine("Error: Missing arguments. Usage: FolderColorizer.exe apply <folderPath> <color>");
+                    Console.Error.WriteLine("Error: Missing arguments. Usage: ChromaFolder.exe apply <folderPath> <color>");
                     return 1;
                 }
 
@@ -68,7 +76,7 @@ namespace FolderColorizer
                 if (!ok)
                 {
                     Console.Error.WriteLine("Error: " + error);
-                    MessageBox.Show(error, "Folder Colorizer", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show(error, "ChromaFolder", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return 1;
                 }
                 Console.WriteLine("Successfully colored folder '" + targetFolder + "' to " + color + ".");
@@ -79,7 +87,7 @@ namespace FolderColorizer
             {
                 if (args.Length < 2)
                 {
-                    Console.Error.WriteLine("Error: Missing argument. Usage: FolderColorizer.exe reset <folderPath>");
+                    Console.Error.WriteLine("Error: Missing argument. Usage: ChromaFolder.exe reset <folderPath>");
                     return 1;
                 }
 
@@ -89,7 +97,7 @@ namespace FolderColorizer
                 if (!ok)
                 {
                     Console.Error.WriteLine("Error: " + error);
-                    MessageBox.Show(error, "Folder Colorizer", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show(error, "ChromaFolder", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return 1;
                 }
                 Console.WriteLine("Successfully reset folder '" + targetFolder + "' to default.");
@@ -106,7 +114,7 @@ namespace FolderColorizer
                     Console.Error.WriteLine("Registration failed: " + error);
                     return 1;
                 }
-                Console.WriteLine("Successfully registered Folder Colorizer context menu.");
+                Console.WriteLine("Successfully registered ChromaFolder context menu.");
                 return 0;
             }
 
@@ -119,14 +127,14 @@ namespace FolderColorizer
                     Console.Error.WriteLine("Unregistration failed: " + error);
                     return 1;
                 }
-                Console.WriteLine("Successfully unregistered Folder Colorizer context menu.");
+                Console.WriteLine("Successfully unregistered ChromaFolder context menu.");
                 return 0;
             }
 
             if (verb == "status")
             {
                 var assignments = LedgerManager.LoadAssignments();
-                Console.WriteLine("=== Folder Colorizer Assignments Ledger ===");
+                Console.WriteLine("=== ChromaFolder Assignments Ledger ===");
                 Console.WriteLine(string.Format("Total tracked: {0}", assignments.Count));
                 foreach (var a in assignments)
                 {
@@ -152,14 +160,14 @@ namespace FolderColorizer
 
         private static void ShowUsage()
         {
-            Console.WriteLine("Folder Colorizer for Windows 11");
+            Console.WriteLine("ChromaFolder for Windows 11");
             Console.WriteLine("Usage:");
-            Console.WriteLine("  FolderColorizer.exe apply <folderPath> <color>");
-            Console.WriteLine("  FolderColorizer.exe reset <folderPath>");
-            Console.WriteLine("  FolderColorizer.exe register");
-            Console.WriteLine("  FolderColorizer.exe unregister");
-            Console.WriteLine("  FolderColorizer.exe status");
-            Console.WriteLine("  FolderColorizer.exe gui");
+            Console.WriteLine("  ChromaFolder.exe apply <folderPath> <color>");
+            Console.WriteLine("  ChromaFolder.exe reset <folderPath>");
+            Console.WriteLine("  ChromaFolder.exe register");
+            Console.WriteLine("  ChromaFolder.exe unregister");
+            Console.WriteLine("  ChromaFolder.exe status");
+            Console.WriteLine("  ChromaFolder.exe gui");
             Console.WriteLine();
             Console.WriteLine("Colors: red, blue, green, yellow, orange, purple");
         }
@@ -167,7 +175,7 @@ namespace FolderColorizer
         private static Form CreateGuiWindow(string assetsDir)
         {
             Form form = new Form();
-            form.Text = "Folder Colorizer — Palette Preview & Manager";
+            form.Text = "ChromaFolder — Palette Preview & Manager";
             form.Width = 520;
             form.Height = 380;
             form.FormBorderStyle = FormBorderStyle.FixedDialog;
@@ -262,17 +270,17 @@ namespace FolderColorizer
                 {
                     if (string.IsNullOrEmpty(txtFolder.Text))
                     {
-                        MessageBox.Show("Please select or drop a folder first.", "Folder Colorizer", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        MessageBox.Show("Please select or drop a folder first.", "ChromaFolder", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         return;
                     }
                     string err;
                     if (FolderManager.ApplyColor(txtFolder.Text, c, assetsDir, out err))
                     {
-                        MessageBox.Show("Folder successfully colorized to " + c + "!", "Folder Colorizer", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        MessageBox.Show("Folder successfully colorized to " + c + "!", "ChromaFolder", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                     else
                     {
-                        MessageBox.Show("Error: " + err, "Folder Colorizer", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        MessageBox.Show("Error: " + err, "ChromaFolder", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     }
                 };
                 form.Controls.Add(btnColor);
@@ -288,17 +296,17 @@ namespace FolderColorizer
             {
                 if (string.IsNullOrEmpty(txtFolder.Text))
                 {
-                    MessageBox.Show("Please select or drop a folder first.", "Folder Colorizer", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show("Please select or drop a folder first.", "ChromaFolder", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return;
                 }
                 string err;
                 if (FolderManager.ResetColor(txtFolder.Text, out err))
                 {
-                    MessageBox.Show("Folder restored to default icon.", "Folder Colorizer", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show("Folder restored to default icon.", "ChromaFolder", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 else
                 {
-                    MessageBox.Show("Error: " + err, "Folder Colorizer", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show("Error: " + err, "ChromaFolder", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
             };
             form.Controls.Add(btnReset);

@@ -83,10 +83,12 @@ namespace FolderColorizer.Core
                     ShellHelper.SetFileAttributes(iniPath, ShellHelper.FILE_ATTRIBUTE_NORMAL);
                 }
 
-                // Construct desktop.ini content
+                // Construct desktop.ini content with full compatibility
                 StringBuilder sb = new StringBuilder();
                 sb.AppendLine("[.ShellClassInfo]");
                 sb.AppendLine("IconResource=" + iconPath + ",0");
+                sb.AppendLine("IconFile=" + iconPath);
+                sb.AppendLine("IconIndex=0");
                 sb.AppendLine("[ViewState]");
                 sb.AppendLine("Mode=");
                 sb.AppendLine("Vid=");

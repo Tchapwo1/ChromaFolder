@@ -6,16 +6,27 @@ namespace FolderColorizer.Core
 {
     public static class RegistryManager
     {
-        private const string RootShellKey = @"Software\Classes\Directory\shell\FolderColorizer";
-        private const string BackgroundShellKey = @"Software\Classes\Directory\Background\shell\FolderColorizer";
+        private const string RootShellKey = @"Software\Classes\Directory\shell\ChromaFolder";
+        private const string BackgroundShellKey = @"Software\Classes\Directory\Background\shell\ChromaFolder";
+        private const string LegacyRootShellKey = @"Software\Classes\Directory\shell\FolderColorizer";
+        private const string LegacyBackgroundShellKey = @"Software\Classes\Directory\Background\shell\FolderColorizer";
 
         public static bool RegisterContextMenu(string exePath, string assetsDir, out string errorMessage)
         {
             errorMessage = null;
             try
             {
+                // Clean up any legacy registry keys first
+                try
+                {
+                    Registry.CurrentUser.DeleteSubKeyTree(LegacyRootShellKey, false);
+                    Registry.CurrentUser.DeleteSubKeyTree(LegacyBackgroundShellKey, false);
+                }
+                catch { }
+
                 RegisterForTarget(RootShellKey, exePath, assetsDir, "%1");
                 RegisterForTarget(BackgroundShellKey, exePath, assetsDir, "%V");
+                ShellHelper.NotifyShellAssociationsChanged();
                 return true;
             }
             catch (Exception ex)
@@ -31,8 +42,8 @@ namespace FolderColorizer.Core
             {
                 if (key == null) throw new InvalidOperationException("Could not create registry key: " + rootPath);
 
-                key.SetValue("", "Folder Colorizer");
-                key.SetValue("MUIVerb", "Folder Colorizer");
+                key.SetValue("", "ChromaFolder");
+                key.SetValue("MUIVerb", "ChromaFolder");
                 key.SetValue("SubCommands", "");
 
                 string appIcon = Path.Combine(assetsDir, "app_icon.ico");
@@ -95,6 +106,15 @@ namespace FolderColorizer.Core
             {
                 Registry.CurrentUser.DeleteSubKeyTree(RootShellKey, false);
                 Registry.CurrentUser.DeleteSubKeyTree(BackgroundShellKey, false);
+
+                try
+                {
+                    Registry.CurrentUser.DeleteSubKeyTree(LegacyRootShellKey, false);
+                    Registry.CurrentUser.DeleteSubKeyTree(LegacyBackgroundShellKey, false);
+                }
+                catch { }
+
+                ShellHelper.NotifyShellAssociationsChanged();
                 return true;
             }
             catch (Exception ex)
